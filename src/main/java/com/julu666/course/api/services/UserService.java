@@ -7,11 +7,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
+
     @Autowired
     private UserRepository userRepository;
 
     public Users getUser(Long id) {
         return userRepository.findById(id).get();
     }
-
+    public Boolean newUser(Users user) {
+        return userRepository.save(user).getId() != 0;
+    }
 }
