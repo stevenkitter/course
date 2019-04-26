@@ -16,8 +16,8 @@ public class Base {
 
     @Column(name = "id")
     private Long id;
-    @Column(name = "created_at")
+
     private Time created_at;
-    @Column(name = "updated_at")
+
     private Time updated_at;
 }
