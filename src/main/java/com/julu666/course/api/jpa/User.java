@@ -11,7 +11,7 @@ import javax.persistence.Table;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "users")
-public class Users extends Base{
+public class User extends Base{
     private String userId = "das";
     private Integer userRole = 0;
     private String wxSessionId = "";
