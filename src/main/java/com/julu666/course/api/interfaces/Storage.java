@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 public interface Storage {
     void init();
-    void store(MultipartFile file);
+    String store(MultipartFile file);
     Stream<Path> loadAll();
     Path load(String filename);
     Resource loadAsResource(String filename);

@@ -31,7 +31,6 @@ public class ApiApplication {
     @Bean
     CommandLineRunner init(Storage storage) {
         return (args) -> {
-            storage.deleteAll();
             storage.init();
         };
     }

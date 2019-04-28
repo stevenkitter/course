@@ -22,4 +22,5 @@ public class CourseController {
                 Wrapper.failActionResp("创建失败", "")
                 ;
     }
+
 }

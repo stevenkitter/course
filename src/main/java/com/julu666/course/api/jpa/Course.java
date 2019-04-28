@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity

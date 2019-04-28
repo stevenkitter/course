@@ -25,15 +25,22 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FileService implements Storage {
 
-    private Path rootLocation;
+    private final Path rootLocation;
 
     @Autowired
-    public void FileSystemStorageService(StorageProperties properties) {
-        this.rootLocation = Paths.get(properties.getLocation());
+    public FileService(StorageProperties properties) {
+        this.rootLocation = Paths.get(properties.getLocation())
+                .toAbsolutePath()
+                .normalize();
+        try {
+            Files.createDirectories(this.rootLocation);
+        } catch (Exception ex) {
+            throw new StorageException("Could not create the directory where the uploaded files will be stored.", ex);
+        }
     }
 
     @Override
-    public void store(MultipartFile file) {
+    public String store(MultipartFile file) {
         String filename = StringUtils.cleanPath(file.getOriginalFilename());
         try {
             if (file.isEmpty()) {
@@ -45,10 +52,11 @@ public class FileService implements Storage {
                         "Cannot store file with relative path outside current directory "
                                 + filename);
             }
-            try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, this.rootLocation.resolve(filename),
+            InputStream inputStream = file.getInputStream();
+            Files.copy(inputStream, this.rootLocation.resolve(filename),
                         StandardCopyOption.REPLACE_EXISTING);
-            }
+            return  filename;
+
         }
         catch (IOException e) {
             throw new StorageException("Failed to store file " + filename, e);
@@ -76,7 +84,7 @@ public class FileService implements Storage {
     @Override
     public Resource loadAsResource(String filename) {
         try {
-            Path file = load(filename);
+            Path file = load(filename).normalize();
             Resource resource = new UrlResource(file.toUri());
             if (resource.exists() || resource.isReadable()) {
                 return resource;
