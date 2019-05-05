@@ -1,16 +1,14 @@
 package com.julu666.course.api.controllers;
 
 import com.julu666.course.api.exceptions.StorageFileNotFoundException;
+import com.julu666.course.api.jpa.TKFile;
+import com.julu666.course.api.repositories.FileRepository;
+import com.julu666.course.api.requests.course.FileAddRequest;
 import com.julu666.course.api.response.Response;
 import com.julu666.course.api.response.UploadFileResponse;
 import com.julu666.course.api.services.FileService;
-import com.sun.deploy.uitoolkit.impl.awt.AWTFrameWindow;
-import org.jcodec.api.FrameGrab;
-import org.jcodec.api.JCodecException;
-import org.jcodec.api.awt.AWTFrameGrab;
-import org.jcodec.common.io.FileChannelWrapper;
-import org.jcodec.common.io.NIOUtils;
-import org.jcodec.common.model.Picture;
+import com.julu666.course.api.utils.FileNameExt;
+import com.julu666.course.api.utils.JWTToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +21,17 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import retrofit2.http.Multipart;
 
+import javax.annotation.Resources;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 public class FileController {
+
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
     private FileService fileService;
@@ -43,50 +41,33 @@ public class FileController {
         this.fileService = fileService;
     }
 
+    @javax.annotation.Resource(name="fileRepository")
+    private FileRepository fileRepository;
+
+
     @PostMapping("/uploadFile")
-    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
+    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file, String userId) {
         String filename = fileService.store(file);
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/downloadFile/")
                 .path(filename)
                 .toUriString();
-        if (file.getContentType().contains("video")) {
-
-
-
-        }
+        TKFile tkFile = new TKFile();
+        tkFile.setUserId(userId);
+        tkFile.setThumbnailName(FileNameExt.getThumbnailPath(filename));
+        tkFile.setFileName(filename);
+        fileRepository.save(tkFile);
         return new UploadFileResponse(filename, fileDownloadUri,
-                file.getContentType(), file.getSize());
+                file.getContentType(), FileNameExt.getThumbnailPath(filename), file.getSize());
     }
 
-    public void saveThumbnail(MultipartFile file, String filename, String path ) {
-        int frameNumber = 10;
-        File fi = null;
-        try {
-            fi = new File(filename + path);
-            file.transferTo(fi);
-        } catch (IOException | NullPointerException ex) {
-            logger.info("");
-        }
-
-        FileChannelWrapper in = null;
-        try {
-            in = NIOUtils.readableChannel(fi);
-            AWTFrameGrab fg = AWTFrameGrab.createAWTFrameGrab(in);
-
-        } catch ( IOException | JCodecException ex) {
-            logger.error("");
-        } finally {
-            NIOUtils.closeQuietly(in);
-        }
-
-    }
 
     @PostMapping("/uploadFiles")
-    public Response<List<UploadFileResponse>> uploadFiles(@RequestParam("files") MultipartFile[] files) {
+    public Response<List<UploadFileResponse>> uploadFiles(@RequestHeader(value="Authorization") String authorization, @RequestParam("files") MultipartFile[] files) {
+        String userId = JWTToken.userId(authorization);
         List<UploadFileResponse> uploaded = Arrays.asList(files)
                 .stream()
-                .map(file -> uploadFile(file))
+                .map(file -> uploadFile(file, userId))
                 .collect(Collectors.toList());
         return new Response<>(200, "", uploaded);
     }

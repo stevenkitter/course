@@ -5,7 +5,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import java.util.UUID;
 
 
 @Data
@@ -17,4 +19,11 @@ public class Course extends Base {
     private String userId;
     private String title;
     private String description;
+    @PrePersist
+    void onPrePersist() {
+        this.courseId = UUID.randomUUID().toString();
+    }
+
 }
+
+
