@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
 
 @Service
 public class FileService implements Storage {
@@ -42,6 +45,23 @@ public class FileService implements Storage {
     @Override
     public String store(MultipartFile file) {
         String filename = StringUtils.cleanPath(file.getOriginalFilename());
+        Date today = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(today);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        String filePath = year + "/" + month + "/" + day + "/" + filename;
+        String fileDirectory = this.rootLocation.toString() + "/" + year + "/" + month + "/" + day;
+        Path pa = Paths.get(fileDirectory)
+                .toAbsolutePath()
+                .normalize();
+        try {
+            Files.createDirectories(pa);
+        } catch (Exception ex) {
+            throw new StorageException("Could not create the directory where the uploaded files will be stored.", ex);
+        }
+
         try {
             if (file.isEmpty()) {
                 throw new StorageException("Failed to store empty file " + filename);
@@ -52,10 +72,13 @@ public class FileService implements Storage {
                         "Cannot store file with relative path outside current directory "
                                 + filename);
             }
+
             InputStream inputStream = file.getInputStream();
-            Files.copy(inputStream, this.rootLocation.resolve(filename),
+
+            Files.copy(inputStream, this.rootLocation.resolve(fileDirectory + "/" + filename),
                         StandardCopyOption.REPLACE_EXISTING);
-            return  filename;
+
+            return  filePath;
 
         }
         catch (IOException e) {
