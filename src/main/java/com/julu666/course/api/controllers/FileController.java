@@ -3,7 +3,7 @@ package com.julu666.course.api.controllers;
 import com.julu666.course.api.exceptions.StorageFileNotFoundException;
 import com.julu666.course.api.jpa.TKFile;
 import com.julu666.course.api.repositories.FileRepository;
-import com.julu666.course.api.requests.course.FileAddRequest;
+
 import com.julu666.course.api.response.Response;
 import com.julu666.course.api.response.UploadFileResponse;
 import com.julu666.course.api.services.FileService;
@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.annotation.Resources;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.util.Arrays;
@@ -57,13 +57,20 @@ public class FileController {
         tkFile.setThumbnailName(FileNameExt.getThumbnailPath(filename));
         tkFile.setFileName(filename);
         fileRepository.save(tkFile);
-        return new UploadFileResponse(filename, fileDownloadUri,
+        return new UploadFileResponse(tkFile.getFileId(), filename, fileDownloadUri,
                 file.getContentType(), FileNameExt.getThumbnailPath(filename), file.getSize());
+    }
+
+    @PostMapping("/uploadOneFile")
+    public Response<UploadFileResponse> uploadOneFile(@RequestHeader(value="Token") String token, @RequestParam("file") MultipartFile file) {
+        String userId = JWTToken.userId(token);
+        UploadFileResponse uploadFileResponse = uploadFile(file, userId);
+        return new Response<>(200, "", uploadFileResponse);
     }
 
 
     @PostMapping("/uploadFiles")
-    public Response<List<UploadFileResponse>> uploadFiles(@RequestHeader(value="Authorization") String authorization, @RequestParam("files") MultipartFile[] files) {
+    public Response<List<UploadFileResponse>> uploadFiles(@RequestHeader(value="Token") String authorization, @RequestParam("files") MultipartFile[] files) {
         String userId = JWTToken.userId(authorization);
         List<UploadFileResponse> uploaded = Arrays.asList(files)
                 .stream()

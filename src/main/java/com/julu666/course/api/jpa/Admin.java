@@ -12,16 +12,14 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "files")
-public class TKFile extends Base {
-    private String fileId;
+@Table(name = "admins")
+public class Admin extends Base {
     private String userId;
-    private String fileName;
-    private String thumbnailName;
-    private String sourceId = "";
+    private String phone;
+    private String password;
 
     @PrePersist
     void onPrePersist() {
-        this.fileId = UUID.randomUUID().toString();
+        this.userId = UUID.randomUUID().toString();
     }
 }

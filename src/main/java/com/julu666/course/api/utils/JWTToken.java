@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class JWTToken {
 
-    public static Key key = new SecretKeySpec("desk23123dc&213*211wall22".getBytes(),
+    public static Key key = new SecretKeySpec("desk23123dc&213*211wall22desk23123dc&213*211wall22desk23123dc&213*211wall22".getBytes(),
             SignatureAlgorithm.HS256.getJcaName());
 
     public static String generateToken(String userId) {
@@ -40,7 +40,7 @@ public class JWTToken {
         }
         String token = tokens[1];
         Claims claims = JWTToken.parseJWT(token);
-        if (claims.get("userId").toString() != "") {
+        if (claims.get("userId").toString() == "") {
             return "";
         }
         return claims.get("userId").toString();

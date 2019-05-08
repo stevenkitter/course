@@ -4,13 +4,15 @@ import lombok.Data;
 
 @Data
 public class UploadFileResponse {
+    private String fileId;
     private String fileName;
     private String fileDownloadUri;
     private String fileType;
     private String thumbnailName;
     private long size;
 
-    public UploadFileResponse(String fileName, String fileDownloadUri, String fileType,String thumbnailName, long size) {
+    public UploadFileResponse(String fileId, String fileName, String fileDownloadUri, String fileType,String thumbnailName, long size) {
+        this.fileId = fileId;
         this.fileName = fileName;
         this.fileDownloadUri = fileDownloadUri;
         this.fileType = fileType;

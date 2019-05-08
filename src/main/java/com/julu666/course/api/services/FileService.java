@@ -4,16 +4,14 @@ import com.julu666.course.api.configuration.StorageProperties;
 import com.julu666.course.api.exceptions.StorageException;
 import com.julu666.course.api.exceptions.StorageFileNotFoundException;
 import com.julu666.course.api.interfaces.Storage;
-import com.julu666.course.api.jpa.TKFile;
-import com.julu666.course.api.repositories.FileRepository;
-import com.julu666.course.api.requests.course.FileAddRequest;
+
 import com.julu666.course.api.utils.FileNameExt;
 import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
 import org.jcodec.api.PictureWithMetadata;
-import org.jcodec.common.DemuxerTrackMeta;
+
 import org.jcodec.common.io.NIOUtils;
-import org.jcodec.common.model.Picture;
+
 import org.jcodec.scale.AWTUtil;
 import org.springframework.stereotype.Service;
 

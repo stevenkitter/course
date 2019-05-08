@@ -6,6 +6,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.sql.Time;
+import java.sql.Timestamp;
 
 @Data
 @MappedSuperclass
@@ -17,7 +18,7 @@ public class Base {
     @Column(name = "id")
     private Long id;
 
-    private Time created_at;
+    private Timestamp created_at;
 
-    private Time updated_at;
+    private Timestamp updated_at;
 }

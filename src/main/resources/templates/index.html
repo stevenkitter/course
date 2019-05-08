@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>视频课堂后台</title>
+    <style>
+        .container {
+            padding: 180px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        h1 {
+            text-align: center;
+        }
+        .login-btn {
+            margin: 100px auto;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" layout:fragment="content">
+        <h1>视频课堂后台</h1>
+        <!-- Accent-colored raised button with ripple -->
+        <a href="/login" class="login-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+            登录
+        </a>
+    </div>
+</body>
+</html>
