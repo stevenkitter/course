@@ -4,6 +4,8 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,8 +35,15 @@ public class JWTToken {
         return claims;
     }
 
-    public static String userId(String authorization) {
-        String[] tokens = authorization.split(" ");
+    public static String userId(String authorization)  {
+        String authorizations = "";
+        try{
+            authorizations = URLDecoder.decode(authorization, "utf-8");
+        } catch (UnsupportedEncodingException ex) {
+
+        }
+
+        String[] tokens = authorizations.split(" ");
         if (tokens.length != 2) {
             return "";
         }

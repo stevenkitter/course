@@ -7,13 +7,14 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.Entity;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "admins")
-public class Admin extends Base {
+public class Admin extends Base implements Serializable {
     private String userId;
     private String phone;
     private String password;

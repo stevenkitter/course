@@ -1,15 +1,15 @@
 package com.julu666.course.api.jpa;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -17,7 +17,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "users")
-public class User extends Base{
+public class User extends Base implements Serializable {
     private String userId = "";
     private Integer userRole = 0;
 
@@ -40,6 +40,13 @@ public class User extends Base{
     private String province = "";
     private String city = "";
     private String language = "";
+
+
+    //relations
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "userId", referencedColumnName = "userId", insertable = false, updatable = false)
+    private List<ApplyTeacher> applies = new ArrayList<>();
 
     @PrePersist
     void onPrePersist() {

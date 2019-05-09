@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{admin/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>审核教师</title>
+</head>
+<body>
+    <div class="container" layout:fragment="content">
+        <table class="layui-table">
+            <colgroup>
+                <col width="80">
+                <col width="100">
+                <col width="200">
+                <col width="100">
+                <col>
+            </colgroup>
+            <thead>
+            <tr>
+                <th>编号</th>
+                <th>申请人</th>
+                <th>时间</th>
+                <th>状态</th>
+                <th>申请理由</th>
+                <th>审核结果</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr th:each="ap : ${approvals}">
+                <td th:text="${ap.id}">1</td>
+                <td th:text="${ap.user.wxNickName}">贤心</td>
+                <td th:text="${ap.created_at}">2016-11-29</td>
+                <td th:text="${ap.status == 0 ? '申请中' : (ap.status == 1 ? '拒绝':'通过')}">人生就像是一场修行</td>
+                <td th:text="${ap.content}">申请成为老师</td>
+                <td th:text="${ap.reason}">证书合格予以通过</td>
+                <td id="layerDemo">
+                    <button data-type="2" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" th:attr="disabled=${ap.status == 0 ? false : true}, data-el_id=${ap.id}">通过</button>
+                    <button data-type="1" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" th:attr="disabled=${ap.status == 0 ? false : true}, data-el_id=${ap.id}">拒绝</button>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+
+        <script>
+            var getCookie = function(cname) {
+                var name = cname + "=";
+                var ca = document.cookie.split(';');
+                for(var i=0; i<ca.length; i++)
+                {
+                    var c = ca[i].trim();
+                    if (c.indexOf(name) === 0) return c.substring(name.length,c.length);
+                }
+                return "";
+            };
+            window.onload = function () {
+                layui.use('layer', function(){
+                    var layer = layui.layer;
+                    var $ = layui.jquery;
+                    var content = "<div id=\"reason_form\">\n" +
+                        "            <form>\n" +
+                        "                <textarea name=\"desc\" id=\"desc\" placeholder=\"请输入理由\" class=\"layui-textarea\"></textarea>\n" +
+                        "            </form>\n" +
+                        "        </div>";
+                    var offset = function(that) {
+                        layer.open({
+                            title: "审批结果",
+                            btn: ["确定"],
+                            content: content,
+                            yes: function(){
+                                var desc = $('#desc[name="desc"]').val();
+                                var token = getCookie("token")
+                                var el_id = that.data('el_id');
+                                var type = that.data('type');
+
+                                $.ajax({
+                                    type: "post",
+                                    url: "/user/approval_teacher",
+                                    headers: {
+                                        "Token": decodeURIComponent(token),
+                                        "Accept": "application/json; charset=utf-8",
+                                        "Content-Type": "application/json"
+                                    },
+                                    data: JSON.stringify({
+                                        id: el_id,
+                                        reason: desc,
+                                        status: type
+                                    }),
+                                    success: function (res) {
+                                        if (res.code === 200) {
+                                            window.location = "/approval";
+                                        }
+                                    }
+                                })
+                            }
+                        });
+                    };
+
+                    $('#layerDemo .mdl-button').on('click', function(){
+                        var that = $(this);
+                        offset(that)
+                    });
+                });
+            }
+        </script>
+    </div>
+
+
+</body>
+</html>

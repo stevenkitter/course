@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
+
 @RestController
 
 @RequestMapping(value = "/user")
@@ -87,6 +88,7 @@ public class UserController {
     @Transactional
     @PostMapping(path="/approval_teacher")
     public Response<String> approvalTeacher(@RequestHeader(value = "Token") String token, @RequestBody ApprovalTeacherRequest request) {
+
         String userId = JWTToken.userId(token);
         if (!applyTeacherRepository.findById(request.getId()).isPresent()) {
             return Wrapper.failActionResp("无相关数据","");
