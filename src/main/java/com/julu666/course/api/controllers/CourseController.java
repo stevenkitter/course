@@ -1,5 +1,6 @@
 package com.julu666.course.api.controllers;
 
+import com.julu666.course.api.constants.Global;
 import com.julu666.course.api.jpa.Course;
 import com.julu666.course.api.jpa.TKFile;
 import com.julu666.course.api.repositories.CourseRepository;
@@ -19,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -59,7 +61,7 @@ public class CourseController {
     public Response<List<Course>> allCourses(@RequestHeader(value="Token") String authorization, @RequestParam(value = "page") Integer page) {
         Page<Course> pageCourse = courseRepository.findTop10(PageRequest.of(page, 10, Sort.Direction.DESC, "created_at"));
 
-        appendUrl(pageCourse);
+        appendUrl(pageCourse.getContent());
 
         return new Response<>(200, "", pageCourse.getContent());
     }
@@ -70,14 +72,14 @@ public class CourseController {
 //        List<Course> courses = courseRepository.findAllByUserId(userId);
         Page<Course> pageCourse = courseRepository.findByUserId(userId, PageRequest.of(page, 10, Sort.Direction.DESC, "created_at"));
 
-        appendUrl(pageCourse);
+        appendUrl(pageCourse.getContent());
 
 
         return new Response<>(200, "", pageCourse.getContent());
     }
 
-    private void appendUrl(Page<Course> pageCourse) {
-        for (Course course : pageCourse.getContent()) {
+    private void appendUrl(List<Course> pageCourse) {
+        for (Course course : pageCourse) {
             TKFile tkFile = course.getTkFile();
             if (tkFile == null) {
                 continue;
@@ -124,5 +126,16 @@ public class CourseController {
 
 
         return Wrapper.okActionResp("删除成功", "");
+    }
+
+    @GetMapping("/famous")
+    public Response<List<Course>> famousList(@RequestHeader(value="Token") String token) {
+        List<Course> courses = new ArrayList<>();
+        for(String id : Global.FamousCourseIds) {
+            Course course = courseRepository.findByCourseId(id).get();
+            courses.add(course);
+        }
+        appendUrl(courses);
+        return new Response<>(200, "", courses);
     }
 }

@@ -68,7 +68,7 @@
                         </dl>
                     </li>
                     <li class="layui-nav-item" th:classappend="${#httpServletRequest.requestURI == '/approval'} ? 'layui-this' : ''"><a href="/approval">教师申请</a></li>
-                    <li class="layui-nav-item"><a href="">发布商品</a></li>
+                    <li class="layui-nav-item" th:classappend="${#httpServletRequest.requestURI == '/book_apply'} ? 'layui-this' : ''"><a href="/book_apply">样本申请</a></li>
                 </ul>
             </div>
         </div>

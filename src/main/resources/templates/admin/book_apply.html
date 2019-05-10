@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{admin/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>审核教师</title>
+</head>
+<body>
+<div class="container" layout:fragment="content">
+    <table class="layui-table">
+        <colgroup>
+            <col width="80">
+            <col width="100">
+            <col width="200">
+            <col width="100">
+            <col>
+        </colgroup>
+        <thead>
+        <tr>
+            <th>编号</th>
+            <th>申请人</th>
+            <th>时间</th>
+            <th>申请状态</th>
+            <th>申请样本书</th>
+            <th>样本书id</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr th:each="ap : ${approvals}">
+            <td th:text="${ap.id}"></td>
+            <td th:text="${ap.user.wxNickName}">贤心</td>
+            <td th:text="${ap.created_at}">2016-11-29</td>
+            <td th:text="${ap.status == 0 ? '申请中' : (ap.status == 1 ? '拒绝': (ap.status == 2 ? '通过,等待发货': (ap.status == 3 ? '已发货,等待签收':'签收成功')))}">人生就像是一场修行</td>
+            <td th:text="${ap.books.name}">申请成为老师</td>
+            <td th:text="${ap.books.id}">证书合格予以通过</td>
+            <td id="layerDemo">
+                <button data-type="2" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" th:attr="disabled=${ap.status == 0 ? false : true}, data-el_id=${ap.id}">通过</button>
+                <button data-type="1" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" th:attr="disabled=${ap.status == 0 ? false : true}, data-el_id=${ap.id}">拒绝</button>
+                <button data-type="3" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" th:attr="disabled=${ap.status == 2 ? false : true}, data-el_id=${ap.id}">发货</button>
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+
+    <script>
+        var getCookie = function(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for(var i=0; i<ca.length; i++)
+            {
+                var c = ca[i].trim();
+                if (c.indexOf(name) === 0) return c.substring(name.length,c.length);
+            }
+            return "";
+        };
+        window.onload = function () {
+            layui.use('layer', function(){
+                var layer = layui.layer;
+                var $ = layui.jquery;
+
+                var offset = function(that) {
+                    layer.open({
+                        title: "提示",
+                        btn: ["确定"],
+                        content: "确定这样做么？",
+                        yes: function(){
+                            var token = getCookie("token")
+                            var el_id = that.data('el_id');
+                            var type = that.data('type');
+                            $.ajax({
+                                type: "post",
+                                url: "/book/approval",
+                                headers: {
+                                    "Token": decodeURIComponent(token),
+                                    "Accept": "application/json; charset=utf-8",
+                                    "Content-Type": "application/json"
+                                },
+                                data: JSON.stringify({
+                                    id: el_id,
+                                    status: type
+                                }),
+                                success: function (res) {
+                                    if (res.code === 200) {
+                                        alert(res.msg)
+                                        window.location = "/book_apply";
+                                    }
+                                }
+                            })
+                        }
+                    });
+                };
+
+                $('#layerDemo .mdl-button').on('click', function(){
+                    var that = $(this);
+                    offset(that)
+                });
+            });
+        }
+    </script>
+</div>
+
+
+</body>
+</html>
