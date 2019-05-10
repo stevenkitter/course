@@ -2,8 +2,10 @@ package com.julu666.course.api.response;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class UploadFileResponse {
+public class UploadFileResponse implements Serializable {
     private String fileId;
     private String fileName;
     private String fileDownloadUri;

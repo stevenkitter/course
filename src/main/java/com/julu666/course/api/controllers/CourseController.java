@@ -78,7 +78,7 @@ public class CourseController {
         return new Response<>(200, "", pageCourse.getContent());
     }
 
-    private void appendUrl(List<Course> pageCourse) {
+    private static void appendUrl(List<Course> pageCourse) {
         for (Course course : pageCourse) {
             TKFile tkFile = course.getTkFile();
             if (tkFile == null) {

@@ -2,6 +2,8 @@ package com.julu666.course.api.response;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /*
 * Response
 * 封装返回值
@@ -10,7 +12,7 @@ import lombok.Data;
 * data 消费数据
 *  */
 @Data
-public class Response<T> {
+public class Response<T> implements Serializable {
     private Integer code;
     private String msg;
     private T data;

@@ -11,5 +11,7 @@ public interface FileRepository extends CrudRepository<TKFile, Long> {
 
     Optional<TKFile> findByFileIdAndSourceId(String fileId, String sourceId);
 
+    Optional<TKFile> findByFileId(String fileId);
+
     Integer deleteByFileId(String fileId);
 }
