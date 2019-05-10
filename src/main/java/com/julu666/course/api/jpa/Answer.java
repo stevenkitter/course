@@ -2,11 +2,13 @@ package com.julu666.course.api.jpa;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -25,13 +27,18 @@ public class Answer extends Base implements Serializable {
     private User user;
 
 
-    @JsonIgnoreProperties("course")
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "answerId", referencedColumnName="sourceId",  insertable = false, updatable = false)
-    private TKFile[] tkFiles;
+    @JsonIgnoreProperties({"answer"})
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "sourceId", referencedColumnName="answerId",  insertable = false, updatable = false)
+    private List<TKFile> tkFiles;
 
     @PrePersist
     void onPrePersist() {
         this.answerId = UUID.randomUUID().toString();
     }
+
+
+    @JsonInclude
+    @Transient
+    private String createTime;
 }

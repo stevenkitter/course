@@ -6,8 +6,10 @@ import com.julu666.course.api.jpa.TKFile;
 import com.julu666.course.api.repositories.AnswerRepository;
 import com.julu666.course.api.repositories.FileRepository;
 import com.julu666.course.api.requests.answer.SaveAnswerRequest;
+import com.julu666.course.api.response.MyAnswerResponse;
 import com.julu666.course.api.response.Response;
 import com.julu666.course.api.response.Wrapper;
+import com.julu666.course.api.utils.DateOperation;
 import com.julu666.course.api.utils.JWTToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,7 +19,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/answer")
@@ -30,16 +37,25 @@ public class AnswerController {
     private FileRepository fileRepository;
 
     @GetMapping("/my")
-    public Response<List<Answer>> myAnswers(@RequestHeader(value = "Token") String token, @RequestParam(value = "page") Integer page) {
+    public Response<MyAnswerResponse> myAnswers(@RequestHeader(value = "Token") String token, @RequestParam(value = "page") Integer page) throws ParseException {
         String userId = JWTToken.userId(token);
         Page<Answer> pages = answerRepository.findByUserIdTop(userId, PageRequest.of(page, 10, Sort.Direction.DESC, "created_at"));
         appendUrl(pages.getContent());
-        return new Response<>(200, "", pages.getContent());
+        MyAnswerResponse myAnswerResponse = new MyAnswerResponse();
+        myAnswerResponse.setCount(answerRepository.count());
+        myAnswerResponse.setAnswers(pages.getContent());
+        return new Response<>(200, "", myAnswerResponse);
     }
 
-    private void appendUrl(List<Answer> pageCourse) {
+    private void appendUrl(List<Answer> pageCourse) throws ParseException {
         for (Answer answer : pageCourse) {
-            TKFile[] tkFiles = answer.getTkFiles();
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:m:s");
+            Date date = format.parse(answer.getCreated_at().toString());
+            answer.setCreateTime(DateOperation.format(date));
+            List<TKFile> tkFiles = answer.getTkFiles();
+            if (tkFiles.size() == 0) {
+                continue;
+            }
             for (TKFile f : tkFiles) {
                 if (f == null) {
                     continue;
@@ -79,5 +95,25 @@ public class AnswerController {
 
         }
         return Wrapper.okActionResp("新建成功", "");
+    }
+
+    @Transactional
+    @DeleteMapping("/delete")
+    public Response<String> deleteAnswer(@RequestHeader(value = "Token") String token, @RequestParam(value = "answerId") String answerId) {
+        String userId = JWTToken.userId(token);
+        Optional<Answer> answer = answerRepository.findByAnswerIdAndUserId(answerId, userId);
+        if (!answer.isPresent()) {
+            return Wrapper.failActionResp("无相关数据","");
+        }
+        Answer answer1 = answer.get();
+        answerRepository.deleteById(answer1.getId());
+
+        for (TKFile tkFile : answer1.getTkFiles()) {
+            if (tkFile != null) {
+                fileRepository.deleteByFileId(tkFile.getFileId());
+            }
+        }
+        return Wrapper.okActionResp("删除成功","");
+
     }
 }

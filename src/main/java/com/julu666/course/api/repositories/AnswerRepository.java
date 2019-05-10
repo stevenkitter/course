@@ -6,7 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.Optional;
+
 public interface AnswerRepository extends CrudRepository<Answer, Long> {
     @Query("SELECT m FROM Answer m WHERE m.id>0")
     Page<Answer> findByUserIdTop(String userId, Pageable pageable);
+
+
+    Optional<Answer> findByAnswerIdAndUserId(String answerId, String userId);
 }

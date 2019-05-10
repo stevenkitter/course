@@ -27,6 +27,11 @@ public class TKFile extends Base implements Serializable {
     private Course course;
 
 
+    @ManyToOne
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","answer"})
+    @JoinColumn(name = "sourceId", referencedColumnName="answerId",  insertable = false, updatable = false)
+    private Answer answer;
+
     @PrePersist
     void onPrePersist() {
         this.fileId = UUID.randomUUID().toString();
