@@ -2,9 +2,12 @@ package com.julu666.course.api.controllers;
 
 
 import com.julu666.course.api.jpa.Answer;
+import com.julu666.course.api.jpa.Comment;
 import com.julu666.course.api.jpa.TKFile;
 import com.julu666.course.api.repositories.AnswerRepository;
+import com.julu666.course.api.repositories.CommentRepository;
 import com.julu666.course.api.repositories.FileRepository;
+import com.julu666.course.api.requests.answer.AddCommentRequest;
 import com.julu666.course.api.requests.answer.SaveAnswerRequest;
 import com.julu666.course.api.response.MyAnswerResponse;
 import com.julu666.course.api.response.Response;
@@ -35,6 +38,9 @@ public class AnswerController {
 
     @Resource
     private FileRepository fileRepository;
+
+    @Resource
+    private CommentRepository commentRepository;
 
     @GetMapping("/my")
     public Response<MyAnswerResponse> myAnswers(@RequestHeader(value = "Token") String token, @RequestParam(value = "page") Integer page) throws ParseException {
@@ -115,5 +121,29 @@ public class AnswerController {
         }
         return Wrapper.okActionResp("删除成功","");
 
+    }
+
+    @PostMapping("/comment")
+    public Response<String> comment(@RequestHeader(value = "Token") String token, @RequestBody AddCommentRequest addCommentRequest){
+        String userId = JWTToken.userId(token);
+        Comment comment = new Comment();
+        comment.setAnswerId(addCommentRequest.getAnswerId());
+        comment.setContent(addCommentRequest.getContent());
+        comment.setUserId(userId);
+        commentRepository.save(comment);
+        return Wrapper.okActionResp("评论成功","");
+    }
+
+    @GetMapping("/commentList")
+    public Response<List<Comment>> getCommentList(@RequestHeader(value = "Token") String token, @RequestParam(value = "page") Integer page, @RequestParam(value = "answerId") String answerId) {
+        Page<Comment> comments = commentRepository.findByAnswerId(answerId, PageRequest.of(page, 10, Sort.Direction.DESC, "created_at"));
+        return new Response<>(200,"", comments.getContent());
+    }
+
+    @GetMapping("/all")
+    public Response<List<Answer>> allAnswer(@RequestHeader(value = "Token") String token, @RequestParam("page") Integer page) throws ParseException {
+        Page<Answer> answers = answerRepository.findAllTop10(PageRequest.of(page, 10, Sort.Direction.DESC, "created_at"));
+        appendUrl(answers.getContent());
+        return new Response<>(200, "", answers.getContent());
     }
 }

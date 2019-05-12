@@ -19,7 +19,7 @@ public class TKFile extends Base implements Serializable {
     private String userId;
     private String fileName;
     private String thumbnailName;
-    private String sourceId = "";
+    private String sourceId;
 
     @JsonIgnoreProperties("tkFile")
     @OneToOne(fetch = FetchType.LAZY)
@@ -28,7 +28,7 @@ public class TKFile extends Base implements Serializable {
 
 
     @ManyToOne
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","answer"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","tkFiles"})
     @JoinColumn(name = "sourceId", referencedColumnName="answerId",  insertable = false, updatable = false)
     private Answer answer;
 
