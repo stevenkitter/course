@@ -58,4 +58,14 @@ public class AdminController {
         model.addAttribute("approvals", pages.getContent());
         return "admin/book_apply";
     }
+
+    @GetMapping(value = "/uploadCourseware")
+    public String uploadCourseware(HttpServletRequest request, Model model){
+        return "uploadCourseware";
+    }
+
+    @GetMapping(value = "/uploadedCourseware")
+    public String uploadedCourseware(HttpServletRequest request, Model model){
+        return "uploadedCourseware";
+    }
 }

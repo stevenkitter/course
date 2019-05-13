@@ -56,6 +56,7 @@ public class FileController {
         tkFile.setUserId(userId);
         tkFile.setThumbnailName(FileNameExt.getThumbnailPath(filename));
         tkFile.setFileName(filename);
+        tkFile.setSourceId("");
         fileRepository.save(tkFile);
         return new UploadFileResponse(tkFile.getFileId(), filename, fileDownloadUri,
                 file.getContentType(), FileNameExt.getThumbnailPath(filename), file.getSize());

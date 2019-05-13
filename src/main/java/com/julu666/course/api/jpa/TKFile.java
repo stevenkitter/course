@@ -22,7 +22,7 @@ public class TKFile extends Base implements Serializable {
     private String sourceId;
 
     @JsonIgnoreProperties("tkFile")
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "sourceId", referencedColumnName="courseId",  insertable = false, updatable = false)
     private Course course;
 

@@ -21,7 +21,7 @@ public class Course extends Base implements Serializable {
     private String description;
 
     @JsonIgnoreProperties("course")
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "courseId", referencedColumnName="sourceId",  insertable = false, updatable = false)
     private TKFile tkFile;
 
