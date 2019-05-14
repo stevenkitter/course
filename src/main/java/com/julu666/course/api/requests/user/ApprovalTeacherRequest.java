@@ -1,4 +1,4 @@
-package com.julu666.course.api.repositories;
+package com.julu666.course.api.requests.user;
 
 import lombok.Data;
 

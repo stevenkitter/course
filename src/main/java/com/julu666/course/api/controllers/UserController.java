@@ -3,13 +3,12 @@ package com.julu666.course.api.controllers;
 import com.julu666.course.api.constants.Global;
 import com.julu666.course.api.jpa.Admin;
 import com.julu666.course.api.jpa.ApplyTeacher;
+import com.julu666.course.api.jpa.TKFile;
 import com.julu666.course.api.jpa.User;
-import com.julu666.course.api.repositories.AdminRepository;
-import com.julu666.course.api.repositories.ApplyTeacherRepository;
-import com.julu666.course.api.repositories.ApprovalTeacherRequest;
-import com.julu666.course.api.repositories.UserRepository;
+import com.julu666.course.api.repositories.*;
 import com.julu666.course.api.requests.user.AdminUserRequest;
 import com.julu666.course.api.requests.user.ApplyToBeTeacherRequest;
+import com.julu666.course.api.requests.user.ApprovalTeacherRequest;
 import com.julu666.course.api.requests.user.SaveUserInfoRequest;
 import com.julu666.course.api.response.Response;
 import com.julu666.course.api.response.Wrapper;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 
 @RestController
@@ -38,6 +38,9 @@ public class UserController {
 
     @Resource(name = "adminRepository")
     private AdminRepository adminRepository;
+
+    @Resource(name = "fileRepository")
+    private FileRepository fileRepository;
 
     @GetMapping(path = "/user")
     public @ResponseBody
@@ -77,11 +80,19 @@ public class UserController {
             return Wrapper.failActionResp("您已申请为老师了～", "");
         }
         ApplyTeacher applyTeacher = new ApplyTeacher();
-        applyTeacher.setFileId(request.getFileId());
         applyTeacher.setContent(request.getContent());
         applyTeacher.setUserId(userId);
         applyTeacher.setAdminId(Global.AdminId);
         applyTeacherRepository.save(applyTeacher);
+
+
+        Optional<TKFile> tkFile = fileRepository.findByFileId(request.getFileId());
+        if (!tkFile.isPresent()) {
+            return Wrapper.failActionResp("无相关文件～", "");
+        }
+        TKFile tkf = tkFile.get();
+        tkf.setSourceId(applyTeacher.getAtId());
+        fileRepository.save(tkf);
         return Wrapper.okActionResp("申请成功，请等待审核", "");
     }
 

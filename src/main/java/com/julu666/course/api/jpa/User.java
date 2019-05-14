@@ -52,4 +52,10 @@ public class User extends Base implements Serializable {
     void onPrePersist() {
         this.userId = UUID.randomUUID().toString();
     }
+
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(name = "usersExercises", joinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId",insertable = false, updatable = false), inverseJoinColumns = @JoinColumn(name = "exerciseId", referencedColumnName = "exerciseId",insertable = false, updatable = false))
+    private List<Exercise> exercises;
 }

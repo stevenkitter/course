@@ -1,0 +1,18 @@
+{
+  "groups": [
+    {
+      "name": "file",
+      "type": "com.julu666.course.api.configuration.StorageProperties",
+      "sourceType": "com.julu666.course.api.configuration.StorageProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "file.location",
+      "type": "java.lang.String",
+      "sourceType": "com.julu666.course.api.configuration.StorageProperties",
+      "defaultValue": "upload"
+    }
+  ],
+  "hints": []
+}

@@ -1,6 +1,5 @@
 package com.julu666.course.api.repositories;
 
-import com.julu666.course.api.jpa.Course;
 import com.julu666.course.api.jpa.Courseware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

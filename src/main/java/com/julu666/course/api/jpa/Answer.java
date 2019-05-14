@@ -28,7 +28,7 @@ public class Answer extends Base implements Serializable {
 
 
     @JsonIgnoreProperties({"answer"})
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name = "sourceId", referencedColumnName="answerId",  insertable = false, updatable = false)
     private List<TKFile> tkFiles;
 

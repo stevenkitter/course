@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <style>
+        .container {
+            align-items: center;
+            padding: 100px;
+        }
+        .form-container {
+            margin-top: 50px;
+        }
+        .login_action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 20px;
+        }
+        .mdl-button {
+            width: 80%;
+        }
+        .error {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" layout:fragment="content">
+        <h1>登录</h1>
+        <div class="form-container mdl-card mdl-shadow--2dp">
+            <form th:action="@{/login}"  th:object="${loginForm}" class="login_action" method="post">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="phone_text" name="phone" autofocus="autofocus">
+                    <label class="mdl-textfield__label" for="phone_text">手机号</label>
+                </div>
+
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="password" id="password_text" name="password" autofocus="autofocus">
+                    <label class="mdl-textfield__label" for="password_text">密码</label>
+                </div>
+                <p th:if="${invalid}" class="error">账号或者密码错误</p>
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" type="submit">登录</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

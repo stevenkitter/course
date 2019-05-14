@@ -3,6 +3,7 @@ package com.julu666.course.api.web.admin;
 
 import com.julu666.course.api.jpa.ApplyBooks;
 import com.julu666.course.api.jpa.ApplyTeacher;
+import com.julu666.course.api.jpa.TKFile;
 import com.julu666.course.api.repositories.ApplyBookRepository;
 import com.julu666.course.api.repositories.ApplyTeacherRepository;
 import com.julu666.course.api.utils.JWTToken;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -47,8 +49,21 @@ public class AdminController {
     @GetMapping(value = "/approval")
     public String approval(HttpServletRequest request, Model model) throws UnsupportedEncodingException {
         Page<ApplyTeacher> pages = applyTeacherRepository.findTop10(PageRequest.of(0, 10, Sort.Direction.DESC, "created_at"));
+        for (ApplyTeacher at : pages.getContent()) {
+            TKFile tkFile = at.getTkFile();
+            tkFile.setFileName(downloadUri(tkFile.getFileName()));
+            tkFile.setThumbnailName(downloadUri(tkFile.getThumbnailName()));
+            at.setTkFile(tkFile);
+        }
         model.addAttribute("approvals", pages.getContent());
         return "admin/approval";
+    }
+
+    private String downloadUri(String filename) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/downloadFile/")
+                .path(filename)
+                .toUriString();
     }
 
 

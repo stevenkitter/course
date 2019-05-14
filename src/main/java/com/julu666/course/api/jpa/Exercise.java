@@ -1,9 +1,11 @@
 package com.julu666.course.api.jpa;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -19,8 +21,14 @@ public class Exercise extends Base {
 
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "exerciseId", referencedColumnName="sourceId",  insertable = false, updatable = false)
+    @JoinColumn(name = "exerciseId",nullable = false, referencedColumnName="sourceId",  insertable = false, updatable = false)
     private TKFile tkFile;
+
+
+
+    @ManyToOne
+    @JoinColumn(name = "userId",nullable = false, referencedColumnName="userId",  insertable = false, updatable = false)
+    private User user;
 
 
     @PrePersist

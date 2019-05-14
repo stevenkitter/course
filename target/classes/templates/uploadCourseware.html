@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>上传课件</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <style>
+        .uploadFile{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #test10 {
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="uploadFile">
+
+            <div class="layui-upload-drag" id="test10">
+                <i class="layui-icon">&#xe67c;</i>
+                <p>点击上传</p>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">课件标题</label>
+                <div class="layui-input-block">
+                    <input type="text" id="title" name="title" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">课件内容</label>
+                <div class="layui-input-block">
+                    <textarea name="desc" id="desc" placeholder="请输入内容" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <button id="submit" class="layui-btn">确定</button>
+
+
+    </div>
+    <script src="/layui/layui.js"></script>
+    <script>
+        //返回对象
+        function getUrlVars() {
+            var vars = {};
+            var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+                vars[key] = value;
+            });
+            return vars;
+        }
+        window.onload = function () {
+            layui.use('upload', function () {
+                var upload = layui.upload;
+                var $ = layui.jquery;
+                var token = getUrlVars()["token"];
+                var fileId = "";
+                upload.render({
+                    elem: '#test10'
+                    ,url: '/uploadOneFile',
+                        headers: {
+                            "Token": decodeURIComponent(token),
+                            "Accept": "application/json; charset=utf-8",
+                        },
+                        choose: function (obj) {
+                            obj.preview(function (index,file,result) {
+                                console.log(file);
+                                var name = file.name;
+                                $('p').text(name);
+                            });
+                        }
+                    ,done: function(res){
+                        fileId = res.data.fileId;
+                    }
+                });
+                $('#submit').on('click', function (ev) {
+                    console.log(ev);
+                    var title = $("#title").val();
+                    var desc = $("#desc").val();
+                    if (fileId === "" || title === "" || desc === "") {
+                        alert("信息不全");
+                        return
+                    }
+
+
+                    $.ajax({
+                        type: "post",
+                        url: "/courseware/add",
+                        headers: {
+                            "Token": decodeURIComponent(token),
+                            "Accept": "application/json; charset=utf-8",
+                            "Content-Type": "application/json"
+                        },
+                        data: JSON.stringify({
+                            fileId: fileId,
+                            title: title,
+                            content: desc
+                        }),
+                        success: function (res) {
+                            if (res.code === 200) {
+                                window.location = "/uploadedCourseware";
+                            }
+                        }
+                    })
+                })
+            })
+        }
+
+    </script>
+</body>
+</html>
