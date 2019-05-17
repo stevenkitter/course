@@ -80,7 +80,10 @@ public class CourseController {
 
     private static void appendUrl(List<Course> pageCourse) {
         for (Course course : pageCourse) {
-            TKFile tkFile = course.getTkFile();
+            if (course.getTkFiles().size() == 0) {
+                return;
+            }
+            TKFile tkFile = course.getTkFiles().get(0);
             if (tkFile == null) {
                 continue;
             }
@@ -94,7 +97,9 @@ public class CourseController {
                     .toUriString();
             tkFile.setThumbnailName(fileThumbDownloadUri);
             tkFile.setFileName(fileDownloadUri);
-            course.setTkFile(tkFile);
+            List<TKFile> tks = new ArrayList<>();
+            tks.add(tkFile);
+            course.setTkFiles(tks);
         }
     }
 
@@ -116,8 +121,8 @@ public class CourseController {
             return Wrapper.failActionResp("无法删除","");
         }
 
-        if (course.getTkFile() != null) {
-            Integer aff = fileRepository.deleteByFileId(course.getTkFile().getFileId());
+        if (course.getTkFiles().size() == 0) {
+            Integer aff = fileRepository.deleteByFileId(course.getTkFiles().get(0).getFileId());
             if (aff == 0) {
                 return Wrapper.failActionResp("无法删除","");
             }

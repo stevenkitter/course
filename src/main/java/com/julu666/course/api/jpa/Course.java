@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -21,9 +22,9 @@ public class Course extends Base implements Serializable {
     private String description;
 
     @JsonIgnoreProperties("course")
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "courseId", referencedColumnName="sourceId",  insertable = false, updatable = false)
-    private TKFile tkFile;
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "sourceId", referencedColumnName="courseId",  insertable = false, updatable = false)
+    private List<TKFile> tkFiles;
 
     @PrePersist
     void onPrePersist() {

@@ -2,9 +2,7 @@ package com.julu666.course.api.controllers;
 
 
 import com.julu666.course.api.constants.Global;
-import com.julu666.course.api.jpa.ApplyBooks;
-import com.julu666.course.api.jpa.Books;
-import com.julu666.course.api.jpa.SampleCategories;
+import com.julu666.course.api.jpa.*;
 import com.julu666.course.api.repositories.ApplyBookRepository;
 import com.julu666.course.api.repositories.BooksRepository;
 import com.julu666.course.api.repositories.CategoriesRepository;
@@ -18,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 
 import javax.annotation.Resource;
@@ -50,6 +49,9 @@ public class BooksController {
     @GetMapping("/books")
     public Response<List<Books>> books(@RequestHeader(value = "Token") String token, @RequestParam(value = "categoryId") Long categoryId) {
         List<Books> books = booksRepository.findByCategoryId(categoryId);
+
+        appendUrl(books);
+
         return new Response<>(200, "", books);
     }
 
@@ -79,7 +81,20 @@ public class BooksController {
 
         Page<ApplyBooks> pages = applyBookRepository.findByUserIdTop10(userId, PageRequest.of(page, 10, Sort.Direction.DESC, "created_at"));
 
-        return new Response<>(200, "", pages.getContent());
+        List<ApplyBooks> books = pages.getContent();
+        for(ApplyBooks ab : books) {
+            Books b = ab.getBooks();
+            String tkFile = b.getIcon();
+
+            if (tkFile == null) {
+                continue;
+            }
+            String fileDownloadUri = downloadUri(tkFile);
+            b.setIcon(fileDownloadUri);
+            ab.setBooks(b);
+        }
+
+        return new Response<>(200, "", books);
     }
 
     @PostMapping("/approval")
@@ -105,4 +120,26 @@ public class BooksController {
         return Wrapper.okActionResp("签收成功","");
 
     }
+
+    private String downloadUri(String filename) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/downloadFile/")
+                .path(filename)
+                .toUriString();
+    }
+
+    private void appendUrl(List<Books> pageCourse) {
+        for (Books book : pageCourse) {
+            String tkFile = book.getIcon();
+
+            if (tkFile == null) {
+                continue;
+            }
+            String fileDownloadUri = downloadUri(tkFile);
+            book.setIcon(fileDownloadUri);
+        }
+    }
+
+
+
 }
