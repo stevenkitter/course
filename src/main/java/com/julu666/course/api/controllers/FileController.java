@@ -48,7 +48,7 @@ public class FileController {
     @PostMapping("/uploadFile")
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file, String userId) {
         String filename = fileService.store(file);
-        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().scheme("https")
                 .path("/downloadFile/")
                 .path(filename)
                 .toUriString();

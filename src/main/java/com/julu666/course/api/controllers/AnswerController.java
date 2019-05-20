@@ -75,7 +75,7 @@ public class AnswerController {
         }
     }
     private String downloadUri(String filename) {
-        return ServletUriComponentsBuilder.fromCurrentContextPath()
+        return ServletUriComponentsBuilder.fromCurrentContextPath().scheme("https")
                 .path("/downloadFile/")
                 .path(filename)
                 .toUriString();

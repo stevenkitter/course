@@ -87,11 +87,11 @@ public class CourseController {
             if (tkFile == null) {
                 continue;
             }
-            String fileThumbDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+            String fileThumbDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().scheme("https")
                     .path("/downloadFile/")
                     .path(tkFile.getThumbnailName())
                     .toUriString();
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().scheme("https")
                     .path("/downloadFile/")
                     .path(tkFile.getFileName())
                     .toUriString();
