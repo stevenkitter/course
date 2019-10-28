@@ -59,7 +59,7 @@ public class AdminController {
         return "admin/approval";
     }
 
-    private String downloadUri(String filename) {
+    public String downloadUri(String filename) {
         return ServletUriComponentsBuilder.fromCurrentContextPath().scheme("https")
                 .path("/downloadFile/")
                 .path(filename)
